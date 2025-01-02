@@ -1,9 +1,12 @@
-"use client"
+"use client";
 import Link from 'next/link';
-import { useState } from 'react';
+import Image from "next/image";
+import { useState, useEffect } from 'react';
+import ThemeSwitch from './ThemeSwitch';
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -11,23 +14,41 @@ const Header: React.FC = () => {
     console.log('Search Query:', searchQuery);
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prev => !prev);
+  };
+
+  // Optional: Close the menu when pressing the Esc key
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
+
   return (
-    <header className="bg-white shadow fixed w-full z-10">
-      <div className="w-full mx-0 px-4 sm:px-6 lg:px-8">
+    <header className="bg-white dark:bg-gray-900 shadow fixed w-full z-20">
+      <div className="w-full mx-0 px-2 lg:px-4">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/">
-                <img
-                  className="h-10 w-auto"
-                  src="/logo.svg" // Replace with your logo path
-                  alt="Site Logo"
-                />
+              <Image
+                className="h-10 w-auto dark:invert"
+                src="/logo.svg"
+                alt="Site Logo"
+                width={10}
+                height={10}
+                priority
+              />
             </Link>
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 flex items-center justify-center px-4">
+          <div className="flex flex-1 items-center justify-center px-4">
             <div className="w-full">
               <form onSubmit={handleSearch}>
                 <label htmlFor="search" className="sr-only">
@@ -37,7 +58,7 @@ const Header: React.FC = () => {
                   <input
                     id="search"
                     name="search"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 sm:text-sm"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 dark:placeholder-gray-200 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-violet-500 sm:text-sm"
                     placeholder="Search..."
                     type="search"
                     value={searchQuery}
@@ -68,17 +89,17 @@ const Header: React.FC = () => {
           <div className="flex items-center">
             <nav className="hidden md:flex space-x-4">
               <Link href="/">
-                <p className="text-gray-700 hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
+                <p className="text-gray-700 dark:text-gray-200 hover:text-violet-500 dark:hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
                   Home
                 </p>
               </Link>
               <Link href="/about">
-                <p className="text-gray-700 hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
+                <p className="text-gray-700 dark:text-gray-200 hover:text-violet-500 dark:hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
                   About
                 </p>
               </Link>
               <Link href="/contact">
-                <p className="text-gray-700 hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
+                <p className="text-gray-700 dark:text-gray-200 hover:text-violet-500 dark:hover:text-violet-500 px-3 py-2 rounded-md text-sm font-medium">
                   Contact
                 </p>
               </Link>
@@ -87,76 +108,103 @@ const Header: React.FC = () => {
 
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center">
-              {/* Implement mobile menu toggle if needed */}
-              {/* Placeholder for mobile menu button */}
               <button
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:bg-gray-700 focus:text-white"
+                className="inline-flex items-center justify-center p-2 rounded-md text-white bg-black hover:text-white hover:bg-violet-700 focus:outline-none focus:bg-violet-700 focus:text-white transition duration-300"
                 aria-controls="mobile-menu"
-                aria-expanded="false"
+                aria-expanded={isMobileMenuOpen}
+                onClick={toggleMobileMenu}
               >
                 <span className="sr-only">Open main menu</span>
-                {/* Icon when menu is closed */}
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-                {/* Icon when menu is open */}
-                <svg
-                  className="hidden h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                {!isMobileMenuOpen ? (
+                  // Menu closed icon
+                  <svg
+                    className="block h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                ) : (
+                  // Menu open icon
+                  <svg
+                    className="block h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
               </button>
             </div>
+          </div>
+          {/* Theme switcher */}
+          <div className="flex items-center pl-4">
+            <ThemeSwitch />
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {/* Implement mobile menu dropdown if needed */}
-      {/* Placeholder for mobile menu */}
-      {/* <div className="md:hidden" id="mobile-menu">
+      {/* Mobile Menu with Slide-in from Right */}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        } transition-transform duration-300 ease-in-out z-30`}
+        id="mobile-menu"
+      >
         <nav className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link href="/">
-            <a className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium">
+            <p
+              className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Home
-            </a>
+            </p>
           </Link>
           <Link href="/about">
-            <a className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium">
+            <p
+              className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               About
-            </a>
+            </p>
           </Link>
           <Link href="/contact">
-            <a className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium">
+            <p
+              className="text-gray-700 hover:text-violet-500 block px-3 py-2 rounded-md text-base font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Contact
-            </a>
+            </p>
           </Link>
           {/* Add more mobile menu items as needed */}
-        {/* </nav>
-      </div> */}
+        </nav>
+      </div>
+
+      {/* Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300 z-25"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        ></div>
+      )}
     </header>
   );
 };
